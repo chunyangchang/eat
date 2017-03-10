@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        canvas{
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<canvas width='600' height='400' id="cas"></canvas>
+</body>
+<script>
+    var cas = document.querySelector('canvas');
+    var aa = cas.getContext('2d');
+    function radian(angle) {
+        return angle * Math.PI / 180;
+    }
+    function create(x, y) {
+        var _this = this;
+        _this.createcircle=function(color,start,end,x,y,r){
+            aa.beginPath();
+            aa.fillStyle = color;
+            aa.moveTo(x, y);
+            aa.arc(x, y, r, radian(start), radian(end));
+            aa.fill();
+        };
+        _this.eye=function(){
+            _this.createcircle('black',0,360,x+10,y-12,5);
+        };
+        _this.head = function (start,end) {
+            _this.createcircle('yellow', end, start, x, y, 30);
+        };
+        _this.mouth=function(start,end){
+            var i = 1;
+
+            _this.timer = setInterval(function () {
+                i++;
+                if (i % 2 == 0) {
+                    _this.createcircle('white',start,end,x,y,30);
+                } else {
+                    _this.createcircle('yellow',start,end,x,y,30);
+                }
+            }, 200)
+        }
+        _this.creatbody = function () {
+            //按键盘动嘴时不能用定时器，因为定时器是函数运行完成之后才能执行，因为键盘按下后圆心是动态获取的
+            //必须等到按下事件结束后才能传进想x,y坐标这时才能用计时器就，所以在跑的时候就没有动嘴的效果了。所以
+            //不能用定时器。
+                var c=1;
+                //键盘摁下事件
+                window.onkeydown = function (e) {
+                    //设置c，b来控制运动过程中嘴动的频率。
+                    c++;
+                    var b=Math.floor(c/10)  ;
+                    var start= -30,
+                            end=30;
+                    var step;
+                    if (e.keyCode == 39) {
+                        step =4;
+                        x += step;
+                    } else if (e.keyCode == 37) {
+                        step = -4;
+                        x += step;
+                        start=start+180;
+                        end=end+180;
+                    } else if (e.keyCode == 38) {
+                        step = -4;
+                        y += step;
+                        start=start+270;
+                        end=end+270;
+                    } else if (e.keyCode == 40) {
+                        step = 4;
+                        y += step;
+                        start=start+90;
+                        end=end+90;
+                    }
+//键盘弹起事件
+                    window.onkeyup = function (e){
+                        _this.mouth(start,end);
+                        _this.head(start,end);
+                        _this.eye();
+                    }
+                    _this.start=start;
+                    _this.end=end;
+                    if(e.keyCode == 39){
+                        //右
+                        aa.clearRect(x-40,y-35,40,70);
+                    }else if(e.keyCode == 37){
+                        //左
+                        aa.clearRect(x,y-35,40,70);
+                    }else if(e.keyCode == 40){
+                        //下
+                        aa.clearRect(x-35,y-40,70,40);
+                    }else if(e.keyCode == 38){
+                        //上
+                        aa.clearRect(x-35,y,70,40);
+                    }
+                    _this.createcircle('yellow',0,360,x,y,30);
+                    _this.eye();
+                    if (b% 2==0) {
+                        clearInterval(_this.timer);
+                        _this.createcircle('white',start,end,x,y,30);
+                    } else{
+                        clearInterval(_this.timer);
+                        _this.createcircle('yellow',start,end,x,y,30);
+                    }
+                }
+        };
+        this.opins=function(){
+            for(var i=0;i<100;i++){
+                var a=Math.random()*cas.width;
+                var b=Math.random()*cas.height;
+                _this.createcircle('black',0,360,a,b,3);
+            }
+        }
+    };
+    var gg = new create(30, 30);
+    gg.head(-30,30);
+    gg.mouth(-30,30);
+    gg.eye();
+    gg.creatbody();
+    gg.opins();
+</script>
+</html>
